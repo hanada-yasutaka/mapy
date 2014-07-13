@@ -1,0 +1,882 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="closeButton">
+    <property name="geometry">
+     <rect>
+      <x>880</x>
+      <y>630</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Close</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>0</y>
+      <width>20</width>
+      <height>661</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="orbitsGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>0</y>
+      <width>351</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>iteration configuratoin</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QPushButton" name="plotButton">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>110</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Plot</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>121</x>
+       <y>20</y>
+       <width>111</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="minimumContentsLength">
+      <number>0</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>point</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>random</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>linear</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>box</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>circle</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>23</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>initial condition:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>211</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Symplectic Integrator condition</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="itaration_lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>261</x>
+       <y>81</y>
+       <width>89</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>51</x>
+       <y>51</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>q:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_2">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>81</y>
+       <width>89</width>
+       <height>19</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>51</y>
+       <width>89</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>51</x>
+       <y>81</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>p:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>171</x>
+       <y>81</y>
+       <width>58</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>itaration:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="samplenum_lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>261</x>
+       <y>51</y>
+       <width>89</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="text">
+      <string>100</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>171</x>
+       <y>51</y>
+       <width>82</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>sample num:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>265</x>
+       <y>165</y>
+       <width>19</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Δt:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>151</x>
+       <y>165</y>
+       <width>39</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>order:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_SI_dt">
+     <property name="geometry">
+      <rect>
+       <x>292</x>
+       <y>165</y>
+       <width>58</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_SI_order">
+     <property name="geometry">
+      <rect>
+       <x>198</x>
+       <y>165</y>
+       <width>57</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <zorder>plotButton</zorder>
+    <zorder>comboBox</zorder>
+    <zorder>label_7</zorder>
+    <zorder>label_8</zorder>
+    <zorder>gridLayoutWidget_2</zorder>
+    <zorder>itaration_lineEdit</zorder>
+    <zorder>horizontalLayoutWidget</zorder>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>591</width>
+      <height>661</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QPushButton" name="ReplotButton">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>630</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Replot</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="canvasClearButton">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>630</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Canvas Clear</string>
+     </property>
+    </widget>
+    <widget class="MplWidget" name="mpl" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>571</width>
+       <height>561</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_qrange">
+     <property name="geometry">
+      <rect>
+       <x>422</x>
+       <y>605</y>
+       <width>68</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>-pi, pi</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>401</x>
+       <y>605</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>q:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_prange">
+     <property name="geometry">
+      <rect>
+       <x>521</x>
+       <y>605</y>
+       <width>69</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>-pi,pi</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>605</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>p:</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>220</y>
+      <width>351</width>
+      <height>411</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>map system configuration</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QPushButton" name="ParameterButton">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>370</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Parameters</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_SystemInfo">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>311</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>difinition</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_Periodicity">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>290</y>
+       <width>311</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Periodicity Condition</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>251</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hamiltonian: H(q,p) = T(q,p) + V(q,p)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>270</y>
+       <width>181</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Periodic boundary condition:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Parameters:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_Parameters">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>170</y>
+       <width>311</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Some Parameters</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuQtMapy">
+    <property name="title">
+     <string>QtMapy</string>
+    </property>
+    <addaction name="actionAboutQtMapy"/>
+    <addaction name="actionAboutMapy"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_new_window"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionLoad"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuMapping">
+    <property name="title">
+     <string>Mapping</string>
+    </property>
+    <addaction name="actionStandard_map"/>
+    <addaction name="actionHenon_map"/>
+    <addaction name="actionHarper_map"/>
+    <addaction name="actionHarmonic_map"/>
+   </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>Analysis</string>
+    </property>
+    <widget class="QMenu" name="menuClassical">
+     <property name="title">
+      <string>Classical</string>
+     </property>
+     <addaction name="actionMapping"/>
+     <addaction name="actionTimeEvolve"/>
+     <addaction name="actionStable_Unstable_mfd"/>
+     <addaction name="actionKAM_curve"/>
+     <addaction name="actionFrequency_Map_Anaysis"/>
+    </widget>
+    <widget class="QMenu" name="menuQuantum">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Quantum</string>
+     </property>
+     <addaction name="actionTime_Evolution"/>
+     <addaction name="actionEnergy_domain"/>
+    </widget>
+    <widget class="QMenu" name="menuComplex">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Complex</string>
+     </property>
+     <addaction name="actionComplex_KAM"/>
+    </widget>
+    <widget class="QMenu" name="menuSemiclassical">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Semiclassical</string>
+     </property>
+     <addaction name="actionM_set"/>
+     <addaction name="actionL_set"/>
+    </widget>
+    <addaction name="menuClassical"/>
+    <addaction name="menuQuantum"/>
+    <addaction name="menuComplex"/>
+    <addaction name="menuSemiclassical"/>
+   </widget>
+   <addaction name="menuQtMapy"/>
+   <addaction name="menuFile"/>
+   <addaction name="menuMapping"/>
+   <addaction name="menuAnalysis"/>
+  </widget>
+  <action name="actionAboutQtMapy">
+   <property name="text">
+    <string>QtMapyについて</string>
+   </property>
+  </action>
+  <action name="actionAboutMapy">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>mapyについて</string>
+   </property>
+  </action>
+  <action name="actionOpen_new_window">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>open new window</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>save</string>
+   </property>
+  </action>
+  <action name="actionLoad">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>load</string>
+   </property>
+  </action>
+  <action name="actionHenon_map">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Henon map</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>QtMapを終了</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>test</string>
+   </property>
+  </action>
+  <action name="actionHarper_map">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Harper map</string>
+   </property>
+  </action>
+  <action name="actionStandard_map">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Standard map</string>
+   </property>
+  </action>
+  <action name="actionHarmonic_map">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Harmonic map</string>
+   </property>
+  </action>
+  <action name="actionTimeEvolve">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Time evolution</string>
+   </property>
+  </action>
+  <action name="actionMapping">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Mapping</string>
+   </property>
+  </action>
+  <action name="actionStable_Unstable_mfd">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Stable/Unstable mfd</string>
+   </property>
+  </action>
+  <action name="actionTime_Evolution">
+   <property name="text">
+    <string>Time domain</string>
+   </property>
+  </action>
+  <action name="actionEnergy_domain">
+   <property name="text">
+    <string>Energy domain</string>
+   </property>
+  </action>
+  <action name="actionComplex_KAM">
+   <property name="text">
+    <string>Complex KAM</string>
+   </property>
+  </action>
+  <action name="actionKAM_curve">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>KAM curve</string>
+   </property>
+  </action>
+  <action name="actionFrequency_Map_Anaysis">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Frequency Map Anaysis</string>
+   </property>
+  </action>
+  <action name="actionM_set">
+   <property name="text">
+    <string>M set</string>
+   </property>
+  </action>
+  <action name="actionL_set">
+   <property name="text">
+    <string>L set</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MplWidget</class>
+   <extends>QWidget</extends>
+   <header>mplwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>samplenum_lineEdit</tabstop>
+  <tabstop>itaration_lineEdit</tabstop>
+  <tabstop>lineEdit_SI_order</tabstop>
+  <tabstop>lineEdit_SI_dt</tabstop>
+  <tabstop>plotButton</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>lineEdit_qrange</tabstop>
+  <tabstop>lineEdit_prange</tabstop>
+  <tabstop>canvasClearButton</tabstop>
+  <tabstop>ReplotButton</tabstop>
+  <tabstop>ParameterButton</tabstop>
+  <tabstop>closeButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>950</x>
+     <y>652</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>949</x>
+     <y>517</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_qrange</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ReplotButton</receiver>
+   <slot>animateClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>464</x>
+     <y>631</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>529</x>
+     <y>670</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_prange</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ReplotButton</receiver>
+   <slot>animateClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>569</x>
+     <y>636</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>568</x>
+     <y>661</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
