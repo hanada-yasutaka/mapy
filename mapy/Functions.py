@@ -5,6 +5,7 @@ import numpy
 import sympy
 import mpmath
 #import mpArray
+twopi=2*numpy.pi
 
 
 def _getattr(x, funcname):
