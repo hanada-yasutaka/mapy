@@ -7,6 +7,8 @@ import mpmath
 #import mpArray
 twopi=2*numpy.pi
 
+savetxt = numpy.savetxt
+
 
 def _getattr(x, funcname):
     if isinstance(x, sympy.Symbol):
@@ -33,3 +35,12 @@ class cos(object):
         name = cls.__name__
         f = _getattr(x, name)
         return f(x)
+        
+        
+def abs2(x):
+    return numpy.abs(x*numpy.conj(x))
+
+def eigen(mat):
+    evals, vecs = numpy.linalg.eig(mat)
+    evecs = [vec for vec in vecs.transpose()]
+    return evals, evecs

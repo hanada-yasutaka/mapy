@@ -26,6 +26,7 @@ class SymplecticIntegrator(object):
             self.evolve = self.Symplectic4            
 #        else:
 #            self.evolve = lambda x: self.Symplectic(x, 1, self.order)
+
         elif order == 6:
             self.evolve = self.Symplectic6
             
@@ -41,6 +42,7 @@ class SymplecticIntegrator(object):
             self.evolve = self.Symplectic16
         else:
             raise SymplecticIntegratorError("Symplectic integrator except 1 or even value")        
+
         
     def _SP(self, x, c=1):
         return numpy.array([x[0], x[1] - c*self.dt*self.funcV(x[0], x[1])])
@@ -60,10 +62,11 @@ class SymplecticIntegrator(object):
     def Symplectic(self,x,z=1,n=2):
         if n == 2:
             return self.Symplectic2(x)
-        beta = 2**(1/(n-1))
-        c = [1/(2-beta), -beta/(2-beta)]
-        x = self.Symplectic(self.Symplectic(self.Symplectic(x, z*c[0], n-2), z*c[1],n-2), z*c[0],n-2) 
-        return x
+        else:
+            beta = 2**(1/(n-1))
+            c = [1/(2-beta), -beta/(2-beta)]
+            x = self.Symplectic(self.Symplectic(self.Symplectic(x, z*c[0], n-2), z*c[1],n-2), z*c[0],n-2) 
+            return x
     """
     def Symplectic4(self,x,z=1):
         beta = 2**(1/3)

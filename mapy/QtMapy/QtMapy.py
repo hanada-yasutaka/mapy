@@ -135,7 +135,7 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         mapping = self.MappingGroup.checkedAction()        
         sysname = mapping.text().split(" ")[0]
         f = getattr(mapy.Systems, sysname)
-        self.mapsys = f(*paras)
+        self.mapsys = f(*paras) # apply(f, paras)
         self.mapsys.periodicity = periodicity
         self.show_system_parameter(self.label_Parameters)    
     def show_system_def(self, sysname,label):
@@ -209,7 +209,7 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
             init = None
             return 
 
-        if self.comboBox_Select_Init.currentText() == 'point':                
+        if self.comboBox_Select_Init.currentText() == 'point':  
             iteration = int(self.itaration_lineEdit.text())
             dt = float(self.lineEdit_SI_dt.text())
             order = int(self.lineEdit_SI_order.text())                        

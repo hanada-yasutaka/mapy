@@ -54,7 +54,7 @@ class Harmonic(Symplectic):
     def func_dHdp(self):
         return lambda x: x
     def funcV(self):
-        return lambda x: self.omega**2*x**2
+        return lambda x: self.omega**2*x**2/2
     def funcT(self):
         return lambda x: x*x/2
         
