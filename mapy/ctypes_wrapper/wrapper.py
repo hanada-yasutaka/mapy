@@ -11,9 +11,9 @@ class call_hsm_rep(object):
 		pmin, pmax = domain[1][0], domain[1][1]
 		#dim= dim
 		h = (qmax - qmin)*(pmax - pmin)/dim
-		vqmin, vqmax = hsm_range[0][0], hsm_range[0][1]
-		vpmin, vpmax = hsm_range[1][0], hsm_range[1][1]
-		row, col = hsm_grid[0], hsm_grid[1]
+		vqmin, vqmax = hsm_range[0]
+		vpmin, vpmax = hsm_range[1]
+		row, col = hsm_grid
 		hsm_data = numpy.zeros([row, col], dtype=numpy.float64)
 		
 		rvec = numpy.copy(vec.real)

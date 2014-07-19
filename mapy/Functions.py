@@ -5,6 +5,7 @@ import numpy
 import sympy
 import mpmath
 #import mpArray
+import matplotlib
 twopi=2*numpy.pi
 
 savetxt = numpy.savetxt
@@ -44,3 +45,23 @@ def eigen(mat):
     evals, vecs = numpy.linalg.eig(mat)
     evecs = [vec for vec in vecs.transpose()]
     return evals, evecs
+
+hsm_cdict = {'blue': ((0.0, 0, 1),
+                  (0.25, 1, 1),                  
+                  (0.34, 1, 1),
+                  (0.65, 0, 0),
+                  (1, 0, 0)),
+        'green': ((0.0, 0, 1),
+                  (0.325, 0.1, 0),                  
+                  (0.375, 1, 1),
+                  (0.64, 1, 1),
+                  (0.91, 0, 0),
+                  (1, 0, 0)),
+        'red': ((0.0, 0, 1), 
+                (0.2, 0, 0),
+                (0.35, 0, 0), 
+                (0.66, 1, 1), 
+                (0.89, 1, 1), 
+                (1, 0.5, 0.5))}
+                  
+hsm_cmap = matplotlib.colors.LinearSegmentedColormap('hsm_colormap',hsm_cdict,256)   

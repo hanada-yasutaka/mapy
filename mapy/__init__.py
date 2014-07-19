@@ -4,5 +4,5 @@ from mapy.SymplecticIntegrator import SymplecticIntegrator as SI
 
 import mapy.Systems
 
-from mapy.Quantum.Qmap import Qmap
+from mapy.Quantum.Qmap import *
 #from mapy.Qmap import Qmap

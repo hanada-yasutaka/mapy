@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'popupAbout.ui'
 #
-# Created: Fri Jul 11 21:24:06 2014
-#      by: PySide UI code generator 4.10.4
+# Created: Sat Jul 19 20:42:24 2014
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 

@@ -9,13 +9,29 @@ class HilbertSpace(object):
         self.dim = self.__setDim(dim)
         self.domain = self.__setDomain(domain)
         self.h = self.__setPlanck()
+        self.x = [np.linspace(self.domain[0][0], self.domain[0][1], self.dim, endpoint=False),
+                  np.linspace(self.domain[1][0], self.domain[1][1], self.dim, endpoint=False)]
+        self._qrep = True                
+        self.__Shift()
+
+    
+    def __Shift(self):
+        if self._qrep:
+            if self.domain[1][0]*self.domain[1][1]<0:
+                self.Shift = [False, True]
+            else:
+                self.Shift = [False, False]
+        else:
+            if self.domain[0][0]*self.domain[0][1]<0:
+                self.Shift = [True, False]
+            else:
+                self.Shift = [False, False]        
         
     def __setDim(self, dim):
         if (dim <= 0) or (dim %2 !=0):
             raise AttributeError("expects dim >0 and even (%d)" % (dim))
         return dim
         
-
     def __setDomain(self, domain):
         qr, pr  = domain[0], domain[1]
 
@@ -41,40 +57,10 @@ class State(HilbertSpace):
         pass
     def pconst(self):
         pass
-
-class SplitOperator(HilbertSpace):
-    def __init__(self, dim, domain, funcT, funcV):
+class PositionBase(HilbertSpace):
+    def __init__(self, dim, domain):
         HilbertSpace.__init__(self, dim, domain)
-        self.funcT = funcT
-        self.funcV = funcV
-        self.x = [np.linspace(self.domain[0][0], self.domain[0][1], self.dim, endpoint=False),
-                  np.linspace(self.domain[1][0], self.domain[1][1], self.dim, endpoint=False)]
-        self._qrep = True
-        self.__Shift()
-    
-    def __Shift(self):
-        if self._qrep:
-            if self.domain[1][0]*self.domain[1][1]<0:
-                self.Shift = [False, True]
-            else:
-                self.Shift = [False, False]
-        else:
-            if self.domain[0][0]*self.domain[0][1]<0:
-                self.Shift = [True, False]
-            else:
-                self.Shift = [False, False]            
-    
-    
-    def operator_expV(self, x, tau=1,isShift=False):
-        if self._qrep and self.Shift[0]:
-            x = np.fft.fftshift(x)
-        return lambda invec: np.exp(-1.j*self.funcV(x)*tau*twopi/self.h)*invec
-        
-    def operator_expT(self,x, tau=1, isShift=True):
-        if self._qrep and self.Shift[1]:
-            x = np.fft.fftshift(x)        
-        return lambda invec: np.exp(-1.j*self.funcT(x)*tau*twopi/self.h)*invec
-    
+                
     def matrix_function(self, f, qp='q'):
         if self._qrep:
             if qp=='q':
@@ -107,6 +93,23 @@ class SplitOperator(HilbertSpace):
             else:
                 mat = np.array([np.fft.ifft(pvec*func(self.x[1])) for pvec in map(np.fft.fft, iden)])
         return mat.transpose()
+                                
+class SplitOperator(PositionBase):
+    def __init__(self, dim, domain, funcT, funcV):
+        PositionBase.__init__(self, dim, domain)
+        self.funcT = funcT
+        self.funcV = funcV
+ 
+    def operator_expV(self, x, dt=1,isShift=False):
+        if self._qrep and self.Shift[0]:
+            x = np.fft.fftshift(x)
+        return lambda invec: np.exp(-1.j*self.funcV(x)*dt*twopi/self.h)*invec
+        
+    def operator_expT(self,x, dt=1, isShift=True):
+        if self._qrep and self.Shift[1]:
+            x = np.fft.fftshift(x)        
+        return lambda invec: np.exp(-1.j*self.funcT(x)*dt*twopi/self.h)*invec
+    
              
     def __annotation(self):
         ann ="DATE: %s\n" % datetime.datetime.now()
@@ -125,11 +128,10 @@ class SplitOperator(HilbertSpace):
         pass
         
 
-    
-class Qmap(SplitOperator):
-    def __init__(self, dim, domain, funcT, funcV, tau=1, order=1):
-        SplitOperator.__init__(self,dim, domain, funcT, funcV)
-        self.tau = tau
+class QIntegrator(SplitOperator):
+    def __init__(self, dim, domain, func_T, func_V, dt=1, order=1):
+        SplitOperator.__init__(self, dim, domain, func_T, func_V)
+        self.dt = dt
         self.order=order
         if order == 1:        
             self.evolve = self.Symplectic1
@@ -146,21 +148,15 @@ class Qmap(SplitOperator):
         elif order==12:
             self.evolve = self.Symplectic12                            
         elif order==14:
-            self.evolve = self.Symplectic14                                        
-                        
+            self.evolve = self.Symplectic14                                                                
         else:
             raise AttributeError("")        
-
-    def UnitaryMatrix(self):
-        mat = np.eye(self.dim, dtype=np.complex128)
-        res = np.array([x for x in map(self.evolve, mat)])
-        return res.transpose()
-        
+    
     def Symplectic1(self, invec, z=1):
         c = z*np.array([1,1])
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
 
         pvec = np.fft.fft(expV(invec))
         qvec = np.fft.ifft(expT(pvec))
@@ -169,8 +165,8 @@ class Qmap(SplitOperator):
     def Symplectic2(self, invec, z=1):
         c = z*np.array([1/2,1])
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
     
         pvec = np.fft.fft(expV(invec))
         qvec = np.fft.ifft(expT(pvec))
@@ -182,8 +178,8 @@ class Qmap(SplitOperator):
         beta = 2**(1/3)
         c = z*np.array([1/(2-beta),-beta/(2-beta)]) 
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
         qvec =self.Symplectic2(invec, c[0])
         qvec =self.Symplectic2(qvec, c[1])
         qvec =self.Symplectic2(qvec, c[0])        
@@ -193,8 +189,8 @@ class Qmap(SplitOperator):
         beta = 2**(1/5)
         c = z*np.array([1/(2-beta),-beta/(2-beta)]) 
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
         qvec =self.Symplectic4(invec, c[0])
         qvec =self.Symplectic4(qvec, c[1])
         qvec =self.Symplectic4(qvec, c[0])        
@@ -204,8 +200,8 @@ class Qmap(SplitOperator):
         beta = 2**(1/7)
         c = z*np.array([1/(2-beta),-beta/(2-beta)]) 
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
         qvec =self.Symplectic6(invec, c[0])
         qvec =self.Symplectic6(qvec, c[1])
         qvec =self.Symplectic6(qvec, c[0])        
@@ -215,8 +211,8 @@ class Qmap(SplitOperator):
         beta = 2**(1/9)
         c = z*np.array([1/(2-beta),-beta/(2-beta)]) 
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
         qvec =self.Symplectic8(invec, c[0])
         qvec =self.Symplectic8(qvec, c[1])
         qvec =self.Symplectic8(qvec, c[0])        
@@ -226,8 +222,8 @@ class Qmap(SplitOperator):
         beta = 2**(1/11)
         c = z*np.array([1/(2-beta),-beta/(2-beta)]) 
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
         qvec =self.Symplectic10(invec, c[0])
         qvec =self.Symplectic10(qvec, c[1])
         qvec =self.Symplectic10(qvec, c[0])        
@@ -237,22 +233,38 @@ class Qmap(SplitOperator):
         beta = 2**(1/13)
         c = z*np.array([1/(2-beta),-beta/(2-beta)]) 
         q, p = self.x
-        expV = self.operator_expV(q,self.tau*c[0], self.Shift[0])        
-        expT = self.operator_expT(p,self.tau*c[1], self.Shift[1])
+        expV = self.operator_expV(q,self.dt*c[0], self.Shift[0])        
+        expT = self.operator_expT(p,self.dt*c[1], self.Shift[1])
         qvec =self.Symplectic12(invec, c[0])
         qvec =self.Symplectic12(qvec, c[1])
         qvec =self.Symplectic12(qvec, c[0])        
         return qvec    
-
-
+        
     
+class Qmap(HilbertSpace):
+    def __init__(self, dim, domain, dt=1, order=1):
+        HilbertSpace.__init__(self, dim, domain)
+        self.dt = dt
+        self.order = order 
 
+
+    def setFunctions(self, func_T, func_V):
+        self.QI = QIntegrator(self.dim, self.domain, func_T, func_V, self.dt, self.order)
+    
+    def HamiltonMatrix(self, func_T, func_V):
+        PB = PositionBase(self.dim, self.domain)
+        matT, matV = PB.get_matrix_funcs(func_T, func_V)
+        return matT + matV
+        
+    def UnitaryMatrix(self):
+        mat = np.eye(self.dim, dtype=np.complex128)
+        res = np.array([x for x in map(self.QI.evolve, mat)])
+        return res.transpose()
+    
     def eigen(self, mat, sort=True):
         evals, evecs = mapy.eigen(mat)
         if sort:
-            print(evals.real)
             index = [i[0] for i in sorted(enumerate(evals.real), key=lambda x:x[1])]
-            print(index)
             evals = np.array([evals[i] for i in index])
             evecs = [evecs[i] for i in index]
         return evals, evecs
@@ -267,10 +279,10 @@ class Qmap(SplitOperator):
     def inners(self, vec0 ,basis):
         return [self.inner(vec0,base) for base in basis]
 
-    def overlap_index(self, basis, evecs):
+    def overlap_index(self, evecs, basis):
         index = []
-        for vec in evecs:
-            ovlp = self.inners(vec, basis)
+        for vec in basis:
+            ovlp = self.inners(vec, evecs)
             ovlp2 = np.abs(np.conj(ovlp)*ovlp)
             i = np.where(ovlp2 == ovlp2.max())[0][0]
             index.append(i)
@@ -286,24 +298,22 @@ class Qmap(SplitOperator):
         return np.abs(np.sum(vec*np.conj(vec)))
 
     def q2p(self, vec):
-        if self._qrep:
-            vec = np.fft.fft(vec)/np.sqrt(self.dim)
-            if self.Shift[1]:
-                vec = np.fft.fftshift(vec)
-            return vec
-        else:
-            pass
+        vec = np.fft.fft(vec)/np.sqrt(self.dim)
+        if self.Shift[1]:
+            vec = np.fft.fftshift(vec)
+        return vec
              
     def p2q(self, vec):
-        if self._qrep:
-            if self.Shift[1]:
-                vec = np.fft.fftshift(vec)        
-            vec = np.fft.ifft(vec)*np.sqrt(self.dim)
-            return vec
-        else:
-            pass
+        if self.Shift[1]:
+            vec = np.fft.fftshift(vec)        
+        vec = np.fft.ifft(vec)*np.sqrt(self.dim)
+        return vec
+    def abs2(self,vec):
+        return np.abs(np.conj(vec)*vec)
+    def quasienergy(self):
+        return [np.nan, np.nan]
     
-    def hsmrep(self, vec, col=50,row=50, vrange=None):
+    def hsmrep(self, vec, grid=[50,50], vrange=None):
         if vrange==None:
             vrange = self.domain
 
@@ -315,17 +325,15 @@ class Qmap(SplitOperator):
         except NameError:
             raise(RuntimeError,"libhsm.so not found.")
             
-        hsm_imag = cw.husimi_rep(vec, self.dim, self.domain, vrange, [row,col])
+        hsm_imag = cw.husimi_rep(vec, self.dim, self.domain, vrange, grid)
 
-        x = np.linspace(vrange[0][0], vrange[0][1], row)
-        y = np.linspace(vrange[1][0], vrange[1][1], col)
+        x = np.linspace(vrange[0][0], vrange[0][1], grid[0])
+        y = np.linspace(vrange[1][0], vrange[1][1], grid[1])
 
         X,Y = np.meshgrid(x,y)
         return X,Y,hsm_imag        
         
 
-
-        
         
         
     
