@@ -1,0 +1,2 @@
+include mapy/source_files/libhsm/*.h
+

@@ -108,7 +108,7 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.mapsys = getattr(mapy.Systems, "Standard")()        
         
         self.SelectMapping()
-        #self.analysis = Mapping.MappingUI(self)
+        self.analysis = Mapping.MappingUI(self)
 
 
     def creatActions(self):

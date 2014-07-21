@@ -14,6 +14,7 @@ class MappingUI(object):
 
         
     def createAction(self):
+        self.mw.plotButton.clicked.connect(self.actPlot)
         self.mw.mpl.canvas.mpl_connect('button_press_event', self.actCanvasPress)
         self.mw.mpl.canvas.mpl_connect('button_release_event', self.actCanvasRelease)        
 #        self.mw.mpl.canvas.mpl_connect('mouse', self.actCanvasPress)        
