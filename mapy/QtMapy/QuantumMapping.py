@@ -141,13 +141,15 @@ class EnergyDomainUI(QuantumUI, Ui_EnergyDomainDialog):
         
         title = "n=%d,\nRe($u_n$)=%f,\nIm($u_n$)=%f,\n $\\varepsilon_n$=%f,\n $\\gamma_n$=%f" % (n, eval.real, eval.imag, ene, gamma)
         self.mainwindow.mpl.canvas.fig.suptitle(title,position=(0.8,0.9))
-        
+#        try(aaa):
         x,y,z = self.qmap.hsmrep(vec,grid=self.grid, vrange=self.hsmrange)
         levels = np.linspace(0,z.max(),50)
 
         self.ax[0].contourf(x,y,z,levels,cmap=mapy.hsm_cmap)        
         self.ax[0].set_xlim(self.vqr)
         self.ax[0].set_ylim(self.vpr)
+#        except OSError:
+#            pass
 
         qvec = self.qmap.abs2(vec)
         pvec = self.qmap.abs2(self.qmap.q2p(vec))

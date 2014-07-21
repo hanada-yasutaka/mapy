@@ -93,6 +93,15 @@ class PositionBase(HilbertSpace):
             else:
                 mat = np.array([np.fft.ifft(pvec*func(self.x[1])) for pvec in map(np.fft.fft, iden)])
         return mat.transpose()
+class HarmonicBase(HilbertSpace):
+    def __init__(self, dim, domain):
+        HilbertSpace.__init__(self, dim, domain)
+    def matrixQ(self):
+        pass
+    def matrixP(self):
+        pass
+    def function2matrix(self):
+        pass
                                 
 class SplitOperator(PositionBase):
     def __init__(self, dim, domain, funcT, funcV):
