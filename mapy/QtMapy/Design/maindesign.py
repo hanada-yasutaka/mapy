@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'maindesign.ui'
 #
-# Created: Sat Jul 19 20:42:24 2014
+# Created: Fri Jul 25 11:53:32 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -272,10 +272,6 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionSave)
         self.menuFile.addAction(self.actionLoad)
         self.menuFile.addSeparator()
-        self.menuMapping.addAction(self.actionStandard_map)
-        self.menuMapping.addAction(self.actionHenon_map)
-        self.menuMapping.addAction(self.actionHarper_map)
-        self.menuMapping.addAction(self.actionHarmonic_map)
         self.menuClassical.addAction(self.actionMapping)
         self.menuClassical.addAction(self.actionTimeEvolve)
         self.menuClassical.addAction(self.actionStable_Unstable_mfd)

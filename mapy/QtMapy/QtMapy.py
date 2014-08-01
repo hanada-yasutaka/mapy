@@ -1,15 +1,14 @@
 
 from __future__ import with_statement
 from PyQt4 import QtCore, QtGui
-
 import numpy as np
 import sympy
 import sys
 import mapy
 
-
 import inspect
 
+version="0.2"
 twopi = 2*np.pi
 
 # import the MainWindow widget from the converted .ui files
@@ -20,9 +19,22 @@ from .Design.mplwidget import MplWidget
 from . import QuantumMapping
 from . import Mapping
 
-MapNames=['Standard', 'Harper', 'Harmonic','Henon']
+MapNames=['Standard', 'Harper', 'Harmonic','Henon','HaradaNormal','JeremyNormal', 'NormannNormal']
 #ClassicalAnalysisNames=['Mapping','TimeEvolve']
-
+def decode_str2number(text, isint=False):
+    strs = text.split(",")
+    xstrs = [x.strip() for x in strs]
+    x = []
+    for y in xstrs:
+        if isint:
+            x.append(int(sympy.N(y)))
+        else:
+            try:
+                x.append(float(sympy.N(y)))                
+            except TypeError:
+                x.append(complex(sympy.N(y)))                
+    return x[0] if len(x) == 1 else x
+        
 
 class SetupDialog(QtGui.QDialog):
     def __init__(self, ui, parent=None):
@@ -85,14 +97,13 @@ class ParameterDialog(QtGui.QDialog):
         self.setWindowTitle('Parameter Setting')
         
     def accept(self):
-        self.paras = [float(x.text()) for x in self.LineEdits]
+        self.paras = [decode_str2number(x.text()) for x in self.LineEdits]
         self.periodicity = [True if x.currentText() == 'True' else False for x in self.Combs]
         self.close()
         
 
 
 class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
-    """Customization for Qt Designer created window"""
     def __init__(self, parent = None):
         super(DesignerMainWindow, self).__init__(parent)
 
@@ -109,7 +120,6 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         
         self.SelectMapping()
         self.analysis = Mapping.MappingUI(self)
-
 
     def creatActions(self):
         #signal slot
@@ -135,19 +145,27 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.MappingGroup.triggered.connect(self.SelectMapping)
         for name in MapNames:
             act = "action" + name + "_map"
+            setattr(self, act,  QtGui.QAction(self))
+            action = getattr(self, act)
+            action.setObjectName(act)
+            action.setText(name)
+            action.setCheckable(True)
+            self.menuMapping.addAction(action)
+            
+            
             self.MappingGroup.addAction(getattr(self, act))
-        
+        self.actionStandard_map.setChecked(True)            
 
         self.actionMapping.triggered.connect(lambda : self.SelectClassicalAnalysis("Mapping"))
         
         self.actionEnergyDomain.triggered.connect(lambda : self.SelectQuantumAnalysis("EnergyDomain"))
+        self.actionEnergy_contour.triggered.connect(self.show_energyContour)
     
     def actCanvasPress(self,event):
         print("H")
     
     def actCanvasRelease(self,event):
         pass    
-
 
     def creatCanvas(self):
         try:
@@ -157,7 +175,6 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
 
         self.mpl = MplWidget(self.canvasBox)
         self.mpl.show()
-
 
     def SelectMapping(self):
         mapping = self.MappingGroup.checkedAction()
@@ -198,8 +215,10 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         f = getattr(mapy.Systems, sysname)
         mapsys = f(*paras)
         T, V = mapsys.get_Hamiltonian()
-        kinetic_info = "T(q,p) = %s" % T(p)
-        potential_info = "V(q,p) = %s" % V(q)
+        funcT = T if len(inspect.getargspec(T)[0]) == 2 else lambda q,p: T(p)
+        funcV = V if len(inspect.getargspec(V)[0]) == 2 else lambda q,p: V(q)        
+        kinetic_info = "T(q,p) = %s" % funcT(q,p)
+        potential_info = "V(q,p) = %s" % funcV(q,p)
         sysinfo = kinetic_info + "\n" + potential_info
         label.setText("%s" % sysinfo)
 
@@ -213,7 +232,11 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.show_system_periodicity(self.label_Periodicity)                
 
     def show_system_periodicity(self,label):
-        p = self.mapsys.periodicity
+        try:
+            p = self.mapsys.periodicity
+        except AttributeError:
+            p = [False, False]
+            
         text = "q: %s\t p:%s" % (p[0],p[1])
         label.setText("%s"% text)
         
@@ -264,6 +287,19 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         return x
         
 
+    def show_energyContour(self):
+        T, V = self.mapsys.get_Hamiltonian()
+        funcT = T if len(inspect.getargspec(T)[0]) == 2 else lambda q,p: T(p)
+        funcV = V if len(inspect.getargspec(V)[0]) == 2 else lambda q,p: V(q)
+        xr = self.decode_str2number(self.lineEdit_qrange.text())
+        yr = self.decode_str2number(self.lineEdit_prange.text())
+        x = np.linspace(xr[0],xr[1],100)
+        y = np.linspace(yr[0],yr[1],100)
+        x,y = np.meshgrid(x,y)
+        H = funcT(x,y) + funcV(x,y)
+        self.mpl.canvas.ax.contour(x,y,H,100)
+        self.mpl.canvas.draw()
+        
         
         
             
@@ -272,5 +308,4 @@ def run():
     dmw = DesignerMainWindow()
     dmw.show()
     sys.exit(app.exec_())
-    
 

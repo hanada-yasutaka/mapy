@@ -23,9 +23,10 @@ class SymplecticIntegrator(object):
         elif order %2 != 0:
             raise SymplecticIntegratorError("Symplectic integrator except 1 or even value")  
         elif order == 4:
-            self.evolve = self.Symplectic4            
-#        else:
-#            self.evolve = lambda x: self.Symplectic(x, 1, self.order)
+            self.evolve = self.Symplectic4
+
+        #else:
+        #    self.evolve = lambda x: self.Symplectic(x, 1, self.order)
 
         elif order == 6:
             self.evolve = self.Symplectic6
@@ -52,11 +53,13 @@ class SymplecticIntegrator(object):
     def Symplectic1(self, x):
         c = [1,1]
         x =self._SQ(self._SP(x,c[0]),c[1])
+#        x =self._SP(self._SQ(x,c[0]),c[1])
         return x
 
     def Symplectic2(self,x, z=1):
         c = [0.5, 1, 0.5]
         x = self._SP(self._SQ(self._SP(x,z*c[0]),z*c[1]), z*c[2])
+#        x = self._SQ(self._SP(self._SQ(x,z*c[0]),z*c[1]), z*c[2])
         return x
     """
     def Symplectic(self,x,z=1,n=2):
@@ -64,13 +67,28 @@ class SymplecticIntegrator(object):
             return self.Symplectic2(x)
         else:
             beta = 2**(1/(n-1))
-            c = [1/(2-beta), -beta/(2-beta)]
+            print(n)
+            c = [-1/(2-beta), -beta/(2-beta)]
             x = self.Symplectic(self.Symplectic(self.Symplectic(x, z*c[0], n-2), z*c[1],n-2), z*c[0],n-2) 
             return x
-    """
+
+    def Symplectic4(self, x, z=1):
+        beta=2**(1/3)
+        c1=1/(2*(2-beta))
+        c2=(1-beta)/(2*(2-beta))
+        d1=1/(2-beta)
+        d2=-beta/(2-beta)
+        y=self._SQ(self._SP(x, c1),d1)
+        y=self._SQ(self._SP(y, c2),d2)
+        y=self._SQ(self._SP(y, c2),d1)
+        y=self._SP(y, c1)
+        return y
+        #S
+    """        
     def Symplectic4(self,x,z=1):
         beta = 2**(1/3)
         c = [1/(2-beta), -beta/(2-beta) ]
+        #x = self.Symplectic2(self.Symplectic2(self.Symplectic2(x,z*c[0]),z*c[1]),z*c[0])
         x = self.Symplectic2(self.Symplectic2(self.Symplectic2(x,z*c[0]),z*c[1]),z*c[0])
         return x
         
