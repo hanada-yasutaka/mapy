@@ -1,8 +1,8 @@
-from PyQt4 import QtGui,QtCore
-#from PyQt4 import QtGui,QtCore
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from PyQt5 import QtGui,QtCore,QtWidgets
+#from PyQt4 import QtWidgets,QtCore
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar2
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar2
 
 
 import numpy as np
@@ -15,12 +15,12 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 
 class MplCanvas(FigureCanvas):
@@ -28,22 +28,22 @@ class MplCanvas(FigureCanvas):
         self.fig = Figure()
         self.ax = self.fig.add_subplot(1,1,1)
         super(MplCanvas, self).__init__(self.fig)
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
         self.updateGeometry()
 
  
 
-class MplWidget(QtGui.QWidget):
+class MplWidget(QtWidgets.QWidget):
     """Widget defined in Qt Designer"""
     def __init__(self, parent = None, navi=True):
-        QtGui.QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
         self.canvas = MplCanvas()
         if navi:
             self.navigation_toolbar = NavigationToolbar2(self.canvas, self)
 
         """ connect click event """
 
-        self.vbl = QtGui.QVBoxLayout()
+        self.vbl = QtWidgets.QVBoxLayout()
         self.vbl.addWidget(self.canvas)
         if navi:
             self.vbl.addWidget(self.navigation_toolbar,0)
@@ -51,7 +51,7 @@ class MplWidget(QtGui.QWidget):
 
         ####
         self.setGeometry(QtCore.QRect(10, 20, 571, 561))
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
@@ -59,19 +59,16 @@ class MplWidget(QtGui.QWidget):
         self.setObjectName(_fromUtf8("mpl"))
 
 
-    
-    
 
-
-class MplDialog(QtGui.QDialog):
+class MplDialog(QtWidgets.QDialog):
     def __init__(self,size=(450,450),navi=True,parent=None):
-        QtGui.QDialog.__init__(self,parent)
+        QtWidgets.QDialog.__init__(self,parent)
 
         self.setObjectName(_fromUtf8("MPLDialog"))
         self.resize(size[0],size[1])
         self.mpl = MplWidget(self,navi)
         self.mpl.setGeometry(QtCore.QRect(0, 0, size[0],size[1]))
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.mpl.sizePolicy().hasHeightForWidth())

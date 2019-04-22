@@ -1,6 +1,6 @@
 
 from __future__ import with_statement
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets, QtWidgets
 import numpy as np
 import sympy
 import sys
@@ -18,8 +18,10 @@ from .Design.mplwidget import MplWidget
 #from .Design.energydomain_dialog import Ui_EnergyDomainDialog
 from . import QuantumMapping
 from . import Mapping
+from . import Complex
+#MapNames=['Standard', 'Harper', 'Harmonic','Henon','HaradaNormal','JeremyNormal', 'NormannNormal','Test']
+MapNames=[sysdef[0] for sysdef in inspect.getmembers(mapy.Systems, inspect.isclass)]
 
-MapNames=['Standard', 'Harper', 'Harmonic','Henon','HaradaNormal','JeremyNormal', 'NormannNormal']
 #ClassicalAnalysisNames=['Mapping','TimeEvolve']
 def decode_str2number(text, isint=False):
     strs = text.split(",")
@@ -36,46 +38,46 @@ def decode_str2number(text, isint=False):
     return x[0] if len(x) == 1 else x
         
 
-class SetupDialog(QtGui.QDialog):
+class SetupDialog(QtWidgets.QDialog):
     def __init__(self, ui, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QtWidgets.QDialog.__init__(self, parent)
         self.ui = ui()
         self.ui.setupUi(self)
 
-class AboutDialog(QtGui.QDialog, Ui_AboutDialog):
+class AboutDialog(QtWidgets.QDialog, Ui_AboutDialog):
     def __init__(self,parent=None):
-        QtGui.QDialog.__init__(self,parent)
+        QtWidgets.QDialog.__init__(self,parent)
         self.setupUi(self)
 
-class ParameterDialog(QtGui.QDialog):
+class ParameterDialog(QtWidgets.QDialog):
     def __init__(self, mapsys, parent=None):
-        QtGui.QDialog.__init__(self,parent)
+        QtWidgets.QDialog.__init__(self,parent)
 
-        grid = QtGui.QGridLayout()
+        grid = QtWidgets.QGridLayout()
         args = inspect.getargspec(mapsys.__init__)[0][1:]
         parameters = [getattr(mapsys, p) for p in args]
 
         self.LineEdits=[]
         for i in range(len(args)):
-            label = QtGui.QLabel("%s:" % args[i])
-            le = QtGui.QLineEdit(self)
+            label = QtWidgets.QLabel("%s:" % args[i])
+            le = QtWidgets.QLineEdit(self)
             le.setText("%f" % parameters[i])
             self.LineEdits.append(le)          
             
             grid.addWidget(label, i, 0)
             grid.addWidget(le, i, 1)
             
-        label = QtGui.QLabel("Priodicity:")
+        label = QtWidgets.QLabel("Priodicity:")
         grid.addWidget(label,i+1,0)
         i = i + 2
         qp = ["q:","p:"]
         self.Combs=[]
         for j in range(2):
             i = i + j
-            label = QtGui.QLabel("%s" % qp[j])
+            label = QtWidgets.QLabel("%s" % qp[j])
             grid.addWidget(label, i, 0)
                         
-            combo = QtGui.QComboBox()
+            combo = QtWidgets.QComboBox()
             combo.addItems(['True','False'])
             if mapsys.periodicity[j]:
                 combo.setCurrentIndex(0)
@@ -85,9 +87,9 @@ class ParameterDialog(QtGui.QDialog):
             grid.addWidget(combo, i, 1)
 
         
-        self.buttonBox = QtGui.QDialogButtonBox(self)
+        self.buttonBox = QtWidgets.QDialogButtonBox(self)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         #self.buttonBox.clicked.connect(self.actClose)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.close)                
@@ -103,7 +105,7 @@ class ParameterDialog(QtGui.QDialog):
         
 
 
-class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
+class DesignerMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent = None):
         super(DesignerMainWindow, self).__init__(parent)
 
@@ -141,11 +143,11 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         
         
         # grouping of definition of mapping 
-        self.MappingGroup = QtGui.QActionGroup(self)
+        self.MappingGroup = QtWidgets.QActionGroup(self)
         self.MappingGroup.triggered.connect(self.SelectMapping)
         for name in MapNames:
             act = "action" + name + "_map"
-            setattr(self, act,  QtGui.QAction(self))
+            setattr(self, act,  QtWidgets.QAction(self))
             action = getattr(self, act)
             action.setObjectName(act)
             action.setText(name)
@@ -160,6 +162,8 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         
         self.actionEnergyDomain.triggered.connect(lambda : self.SelectQuantumAnalysis("EnergyDomain"))
         self.actionEnergy_contour.triggered.connect(self.show_energyContour)
+        
+        self.actionMset.triggered.connect(lambda : self.SelectComplexAnalysis("Mset"))
     
     def actCanvasPress(self,event):
         print("H")
@@ -179,6 +183,8 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def SelectMapping(self):
         mapping = self.MappingGroup.checkedAction()
         sysname = mapping.text().split(" ")[0]
+#        print(sysname,type(sysname))
+#        self.mapsys = getattr(mapy.Systems, "%s" % sysname)()
         self.mapsys = getattr(mapy.Systems, sysname)()
         self.show_system_def(sysname, self.label_SystemInfo)
         self.show_system_parameter(self.label_Parameters)
@@ -192,6 +198,11 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
     def SelectQuantumAnalysis(self, subject):
         if subject == "EnergyDomain":
             self.analysis = QuantumMapping.EnergyDomainUI(self)        
+        self.analysis.show()
+        
+    def SelectComplexAnalysis(self,subject):
+        if subject == "Mset":
+            self.analysis = Complex.MsetUI(self)
         self.analysis.show()
 
 
@@ -215,10 +226,13 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         f = getattr(mapy.Systems, sysname)
         mapsys = f(*paras)
         T, V = mapsys.get_Hamiltonian()
-        funcT = T if len(inspect.getargspec(T)[0]) == 2 else lambda q,p: T(p)
-        funcV = V if len(inspect.getargspec(V)[0]) == 2 else lambda q,p: V(q)        
-        kinetic_info = "T(q,p) = %s" % funcT(q,p)
-        potential_info = "V(q,p) = %s" % funcV(q,p)
+        #funcT = T if len(inspect.getargspec(T)[0]) == 2 else lambda q,p: T(p)
+        #funcV = V if len(inspect.getargspec(V)[0]) == 2 else lambda q,p: V(q)        
+        #kinetic_info = "T(q,p) = %s" % funcT(q,p)
+        #potential_info = "V(q,p) = %s" % funcV(q,p)
+        kinetic_info = "T(q,p)"
+        potential_info = "V(q,p)"
+        
         sysinfo = kinetic_info + "\n" + potential_info
         label.setText("%s" % sysinfo)
 
@@ -304,7 +318,7 @@ class DesignerMainWindow(QtGui.QMainWindow, Ui_MainWindow):
         
             
 def run():
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     dmw = DesignerMainWindow()
     dmw.show()
     sys.exit(app.exec_())

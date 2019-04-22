@@ -9,19 +9,20 @@ class SymplecticIntegratorError(Exception):
         return repr(self.value)
         
 class SymplecticIntegrator(object):
-    def __init__(self, funcT, funcV, dt=1, order=1):
+    def __init__(self, funcT, funcV, dt=1, order=1,iscomplex=False):
         import inspect
-        self.funcT = funcT if len(inspect.getargspec(funcT)[0]) == 2 else lambda q,p: funcT(p)
-        self.funcV = funcV if len(inspect.getargspec(funcV)[0]) == 2 else lambda q,p: funcV(q)
+        self.funcT = funcT #if len(inspect.getargspec(funcT)[0]) == 2 else lambda q,p: funcT(p)
+        self.funcV = funcV #f len(inspect.getargspec(funcV)[0]) == 2 else lambda q,p: funcV(q)
         self.dt=dt
         self.order = order
+        self.iscomplex = iscomplex
         
         if order == 1:
             self.evolve = self.Symplectic1
         elif order == 2:
             self.evolve = self.Symplectic2
-        elif order %2 != 0:
-            raise SymplecticIntegratorError("Symplectic integrator except 1 or even value")  
+        #elif order %2 != 0:
+        #    raise SymplecticIntegratorError("Symplectic integrator except 1 or even value")  
         elif order == 4:
             self.evolve = self.Symplectic4
 
@@ -41,26 +42,46 @@ class SymplecticIntegrator(object):
             self.evolve = self.Symplectic14
         elif order ==16:
             self.evolve = self.Symplectic16
+        elif order==-1:
+            self.evolve = self.Symplectic1R
+        elif order==-2:
+            self.evolve = self.Symplectic2R            
         else:
-            raise SymplecticIntegratorError("Symplectic integrator except 1 or even value")        
+            raise SymplecticIntegratorError("Symplectic integrator except 1 or even value")
+    def getfunc(self):
+        return self.funcT, self.funcV
 
-        
+    def evolves(self, x, tmax):
+        #xx = [numpy.copy(x[0]), numpy.copy(x[1])] 
+        for i in range(tmax):
+            x = self.evolve(x)
+        return x    
+    
     def _SP(self, x, c=1):
-        return numpy.array([x[0], x[1] - c*self.dt*self.funcV(x[0], x[1])])
+        return numpy.array([x[0], x[1] - c*self.dt*self.funcV(x[0])])
     def _SQ(self, x, c=1):
-        return numpy.array([x[0] + c*self.dt*self.funcT(x[0],x[1]), x[1]])        
+        return numpy.array([x[0] + c*self.dt*self.funcT(x[1]), x[1]])
         
     def Symplectic1(self, x):
         c = [1,1]
         x =self._SQ(self._SP(x,c[0]),c[1])
 #        x =self._SP(self._SQ(x,c[0]),c[1])
         return x
+    def Symplectic1R(self,x):
+        c = [1,1]
+        x =self._SP(self._SQ(x,c[0]),c[1])
+        return x        
 
     def Symplectic2(self,x, z=1):
         c = [0.5, 1, 0.5]
         x = self._SP(self._SQ(self._SP(x,z*c[0]),z*c[1]), z*c[2])
 #        x = self._SQ(self._SP(self._SQ(x,z*c[0]),z*c[1]), z*c[2])
         return x
+    def Symplectic2R(self,x, z=1):
+        c = [0.5, 1, 0.5]
+        x = self._SQ(self._SP(self._SQ(x,z*c[0]),z*c[1]), z*c[2])
+        return x
+    
     """
     def Symplectic(self,x,z=1,n=2):
         if n == 2:

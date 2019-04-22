@@ -3,9 +3,11 @@
 from .Design.energydomain_dialog import Ui_EnergyDomainDialog
 from .Design.mplwidget import MplDialog
 from .Mapping import Mapping
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets, QtWidgets
 import numpy as np
 import mapy
+import mapy.Quantum
+import mapy.utility
 import sympy
 import inspect
 import matplotlib.pyplot as plt
@@ -13,9 +15,9 @@ from matplotlib.ticker import NullFormatter
 from .Design.mplwidget import MplWidget
 nullfmt   = NullFormatter()   
                 
-class QuantumUI(QtGui.QDialog):
+class QuantumUI(QtWidgets.QDialog):
     def __init__(self, mainwindow):
-        QtGui.QDialog.__init__(self, parent=mainwindow)
+        QtWidgets.QDialog.__init__(self, parent=mainwindow)
         self.mainwindow=mainwindow        
 
         
@@ -198,7 +200,7 @@ class EnergyDomainUI(QuantumUI, Ui_EnergyDomainDialog):
             levels = np.linspace(0,z.max(),100)
           
             
-            self.ax[0].contourf(x,y,z,levels,cmap=mapy.hsm_cmap)        
+            self.ax[0].contourf(x,y,z,levels,cmap=mapy.utility.hsm_cmap)        
             self.ax[0].set_xlim(self.vqr[0],self.vqr[1])
             self.ax[0].set_ylim(self.vpr[0],self.vpr[1])
         except OSError:
@@ -251,7 +253,7 @@ class EnergyDomainUI(QuantumUI, Ui_EnergyDomainDialog):
         
 
     def SelectAlgorism(self):
-        self.Quantum = mapy.Quantum(self.dim, [self.qr, self.pr])
+        self.Quantum = mapy.Quantum.Quantum(self.dim, [self.qr, self.pr])
 #        self.qmap = mapy.Qmap(self.dim, [self.qr, self.pr], dt=dt, order=order)        
         algo = self.comboBox_SelectAlgorism.currentText()
         if "(SplitOperator)" in algo.split(" "):
@@ -313,7 +315,7 @@ class EnergyDomainUI(QuantumUI, Ui_EnergyDomainDialog):
             index = self.Quantum.variance_sort_index(self.evecs, x0=x0,qp='p')
             self.evals, self.evecs = self.Quantum.sorteigen(self.evals, self.evecs, index)
         else:
-            if np.all(self.evals.imag == 0.0):
+            if np.all(np.abs(self.evals.imag) < 1e-10):
                 index = [i[0] for i in sorted(enumerate(self.evals), key=lambda x:x[1])]
             else:
                 index = [i[0] for i in sorted(enumerate(np.angle(self.evals)), key=lambda x:x[1])]

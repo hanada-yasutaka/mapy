@@ -18,7 +18,6 @@ class Polynomial(Symplectic):
     def __init__(self):
         self.periodicity = [False, False]         
 
-        
 
 class Standard(Symplectic):
     def __init__(self, k=1):
@@ -32,6 +31,109 @@ class Standard(Symplectic):
         return lambda x: self.k*mapy.cos(x)
     def funcT(self):
         return lambda x: x*x/2
+
+class Suris(Standard):
+    def __init__(self, k=1/4):
+        self.periodicity = [False,False]
+        self.k = k
+    def func_dHdq(self):
+        return lambda x: 1/np.pi * mapy.arctan(self.k*mapy.sin(2*np.pi*x)/(1+self.k*mapy.cos(2*np.pi*x)))
+
+    def func_dHdp(self):
+        return lambda x: x
+
+class PerturbedSuris(Suris):
+    def __init__(self, k=1/4,eps = 1/10):
+        self.periodicity = [False,False]
+        self.k = k
+        self.eps = eps 
+    def func_dHdq(self):
+        return lambda x: -1/np.pi * mapy.arctan(self.k*mapy.sin(2*np.pi*x)/(1-self.k*mapy.cos(2*np.pi*x))) - self.eps*np.pi*mapy.sin(2*np.pi*x)
+
+
+
+class Standard_shift(Symplectic):
+    def __init__(self, k=1):
+        self.periodicity = [True, False]
+        self.k = k
+    def func_dHdq(self):
+        return lambda x: -self.k*mapy.sin(x)
+    def func_dHdp(self):
+        return lambda x: (x-1.8849)
+    def funcV(self):
+        return lambda x: self.k*mapy.cos(x)
+    def funcT(self):
+        return lambda x: (x-3)**2/2
+
+    
+class LinearStandard(Symplectic):
+    def __init__(self, k=1,omega=np.sqrt(2)):
+        self.periodicity = [True, True]
+        self.k = k
+        self.omega = omega
+    def func_dHdq(self):
+        return lambda x: -self.k*mapy.sin(x)
+    def func_dHdp(self):
+        return lambda x: self.omega
+    def funcV(self):
+        return lambda x: self.k*mapy.cos(x)
+    def funcT(self):
+        return lambda x: self.omega*x
+        
+class IntegrableStandard(Symplectic):
+    def __init__(self, k=1):
+        self.periodicity = [True, True]
+        self.k = k
+    def func_dHdq(self):
+        return lambda x: -1/(4*np.pi**2)*(self.k*mapy.sin(x)/(2+self.k*mapy.cos(x)))
+    def func_dHdp(self):
+        return lambda x: x
+    def funcV(self):
+        return lambda x: x**2
+    def funcT(self):
+        return lambda x: x**2
+        
+    
+class ShudoIkedaMap(Standard):
+    def __init__(self, k=1.2, pd=5.0,omega=1.0,nu=3.0):
+        Standard.__init__(self, k)
+        self.periodicity = [True, False]
+        self.k = k
+        self.pd = pd
+        self.omega = omega
+        self.nu = nu
+    def funcT(self):
+        h = lambda x: (x/self.pd)**(2*self.nu)
+        return lambda x: x*x/2*h(x)/(h(x) +1) + self.omega*x
+    def func_dHdp(self):
+        h = lambda x: (x/self.pd)**(2*self.nu)
+        #g=numpy.power(x/self.Para.para[1],2*self.Para.para[3])
+        #return ( x*g*(1+self.Para.para[3]+g)/(1+g)/(1+g)+self.Para.para[2] )/twopi        
+        return lambda x: x*h(x)*(h(x) + self.nu+1)/(h(x)+1)**2 + self.omega
+    
+class HypTanStandard(Standard):
+    def __init__(self,k=2.0,omega=0.6418, s=4.173, beta=100.0, d=0.4):
+        Standard.__init__(self,k)
+        self.periodicity = [True, False]            
+        self.k = k
+        self.omega = omega
+        self.s = s
+        self.beta = beta
+        self.d = d
+        
+    def func_dHdp(self):
+        g = lambda x: (x - self.d)
+        s = self.s
+        beta = self.beta
+        return lambda x: s/2*g(x)*(1+np.tanh(beta*g(x))) + s*g(x)**2*beta/4.0/(np.cosh(beta*g(x))**2) + self.omega
+
+    def funcT(self):
+        g = lambda x: (x - self.d)
+        s = self.s
+        beta = self.beta
+        return lambda x: s*g(x)**2/2.0 *( 1 + np.tanh( beta*g(x) ) )/2.0 + self.omega*g(x)
+
+    
         
 class Harper(Symplectic):
     def __init__(self, a=1,b=1):
@@ -47,6 +149,20 @@ class Harper(Symplectic):
         return lambda x: self.a*mapy.cos(x)
     def funcT(self):
         return lambda x: self.b*mapy.cos(x)        
+class HarperNormal(Symplectic):
+    def __init__(self,a=-0.55):
+        self.periodicity = [True, True]
+        self.a = a
+    def funcT(self):
+        return lambda x: mapy.cos(x) + self.a*mapy.cos(x)**2
+    def funcV(self):
+        return lambda x: mapy.cos(x) + self.a*mapy.cos(x)**2
+    def func_dHdq(self):
+        return lambda x: - mapy.sin(x) * (1 + 2*self.a*mapy.cos(x)) 
+    def func_dHdp(self):
+        return lambda x: - mapy.sin(x) * (1 + 2*self.a*mapy.cos(x)) 
+
+
 
         
 class Harmonic(Polynomial):
@@ -73,7 +189,34 @@ class Henon(Polynomial):
     def funcV(self):
         return lambda x: self.epsilon*(2*x*x + x**3/3)
     def funcT(self):
-        return lambda x: x*x/2        
+        return lambda x: x*x/2
+    
+class DoubleWell(Polynomial):
+    def __init__(self):
+        Polynomial.__init__(self)           
+        #self.epsilon = epsilon
+    def func_dHdq(self):
+        return lambda x: 4*x*(-1+x**2)
+    def func_dHdp(self):
+        return lambda x: x
+    def funcV(self):
+        return lambda x: (x**2 - 1)**2
+    def funcT(self):
+        return lambda x: x*x/2
+
+
+class Test(Polynomial):
+    def __init__(self, a=-1):
+        Polynomial.__init__(self)
+        self.a = a
+    def funcT(self):
+        return lambda x: x**2/2 + self.a*x**4/4
+    def funcV(self):
+        return lambda x: x**2/2 + self.a*x**4/4        
+    def func_dHdq(self):
+        return lambda x:(x+self.a*x**3)
+    def func_dHdp(self):
+        return lambda x:(x+self.a*x**3)    
         
 class JeremyNormal(Symplectic):
     def __init__(self, a1=1, a2=-55/100, b=5/100, phi=0):
@@ -83,17 +226,17 @@ class JeremyNormal(Symplectic):
         self.b = b
         self.phi = phi
         
-    def _funcT(self):
+    def funcT(self):
         return lambda q,p: self.a1/2*(q**2 + p**2) + self.a2*(q**4 + q**4 + q*q*p*p + p*p*q*q)
     
-    def _funcV(self):
+    def funcV(self):
         return lambda q,p: np.abs(self.b)*(q**4 + p**4 - 3*(q*q*p*p + q*q*p*p))*mapy.cos(self.phi) \
                 - ((p**3*q + p*p*q*p + p*q*p*p + q*p**3) - (q**3*p + q*q*p*q + q*p*q*q + p*q**3))*mapy.sin(self.phi)
 
-    def funcT(self):
+    def _funcT(self):
         return lambda q,p: (self.a1/2*(Cos(p)**2 + Cos(q)**2)) + self.a2*(Cos(p)**2 + Cos(q)**2)**2
         
-    def funcV(self):
+    def _funcV(self):
 	    return lambda q,p:\
             Abs(self.b)*(\
                 (Cos(p)**4 - 6*Cos(p)**2*Cos(q)**2 + Cos(q)**4)*Cos(self.phi) \
@@ -173,7 +316,6 @@ class JeremyNormal(HaradaNormal):
                 Cos(self.phi)*(-4*Cos(p)**3*Sin(p) + 12*Cos(p)*Cos(q)**2*Sin(p)) \
                 - 4*(-3*Cos(p)**2*Cos(q)*Sin(p) + Cos(q)**3*Sin(p))*Sin(self.phi)
             )            
-
 
 class Standard_SBCH(Standard):
     def __init__(self, k,tau,bch=1):
